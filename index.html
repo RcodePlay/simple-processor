@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Processor V0.1</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+<main id="app">
+  <h1 class="title">Processor V0.1</h1>
+
+  <section class="processor">
+    <div class="processor-info">
+      <p>A TypeScript web processor unit that can process commands according to a list.</p>
+      <hr>
+    </div>
+
+    <div class="processor-output">
+      <p><strong>Processor Output:</strong></p>
+      <p id="processor-output"></p>
+      <hr>
+    </div>
+
+    <div class="processor-input">
+      <form id="command-form">
+        <label for="command-input">Input Command:</label>
+        <input type="text" id="command-input" name="command-input" required>
+        <button type="submit">Execute</button>
+      </form>
+      <button id="button-reset" type="button">Reset</button>
+    </div>
+  </section>
+</main>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
