@@ -37,6 +37,21 @@ export function setupProcessor(outputElement: HTMLElement) {
         params.numB = parseInt(parts[2], 10);
       }
 
+      if (command === "SUBT" && parts.length >= 3) {
+        params.numA = parseInt(parts[1], 10);
+        params.numB = parseInt(parts[2], 10);
+      }
+
+      if (command === "DIVS" && parts.length >= 3) {
+        params.numA = parseInt(parts[1], 10);
+        params.numB = parseInt(parts[2], 10);
+      }
+
+      if (command === "MULT" && parts.length >= 3) {
+        params.numA = parseInt(parts[1], 10);
+        params.numB = parseInt(parts[2], 10);
+      }
+
       processCommand(command, params);
       inputElement.value = ""; // Clear input after execution
 

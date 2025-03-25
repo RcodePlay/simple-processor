@@ -13,47 +13,83 @@ function initializeCommands() {
   commandList.set("IRQ", { code: "0001" }); // Interrupt request
   commandList.set("RST", { code: "0002" }); // Reset
   commandList.set("INC", { code: "0003" }); // Increment program counter
+  commandList.set("JUMP", { code: "0004" }); // Jump and skip the next instruction
+  commandList.set("GPC", { code: "0005" }); // Get program counter
 
   // Define WRITE command with handler
   commandList.set("WRITE", {
-    code: "0004",
+    code: "0006",
     handler: (params: { reg: string; writeValue: number }) => {
       if (!params || !params.reg || params.writeValue === undefined) {
         updateCommandOutput("WRITE command missing required parameters.");
         return;
       }
-      const result = executeCommand("0004", params);
+      const result = executeCommand("0006", params);
       updateCommandOutput(`WRITE executed: ${JSON.stringify(result)}`);
     },
   });
 
   // Define READ command with handler
   commandList.set("READ", {
-    code: "0005",
+    code: "0007",
     handler: (params: { reg: string }) => {
       if (!params || !params.reg) {
         updateCommandOutput("READ command missing required params.");
         return;
       }
-      const result = executeCommand("0005", params);
+      const result = executeCommand("0007", params);
       updateCommandOutput(`READ result: ${JSON.stringify(result)}`);
     },
   });
 
   commandList.set("ADD", {
-    code: "0006",
+    code: "0008",
     handler: (params: { numA: number; numB: number }) => {
       if (!params || !params.numA || !params.numB ) {
         updateCommandOutput("ADD command missing required params.");
         return;
       }
-      const result = executeCommand("0006", params);
+      const result = executeCommand("0008", params);
       updateCommandOutput(`ADD result: ${JSON.stringify(result)}`);
     }
   });
 
-  commandList.set("JUMP", { code: "0007" }); // Jump and skip the next instruction
-  commandList.set("GPC", { code: "0008" }); // Get program counter
+  commandList.set("SUBT", {
+    code: "0009",
+    handler: (params: { numA: number; numB: number }) => {
+      if (!params || !params.numA || !params.numB) {
+        updateCommandOutput("SUBT command missing required params.");
+        return;
+      }
+      const result = executeCommand("0009", params);
+      updateCommandOutput(`SUBT result: ${JSON.stringify(result)}`);
+    }
+  })
+
+  commandList.set("DIVS", {
+    code: "0010",
+    handler: (params: { numA: number; numB: number }) => {
+      if (!params || !params.numA || !params.numB) {
+        updateCommandOutput("DIVS command missing required params.");
+        return;
+      }
+      const result = executeCommand("0010", params);
+      updateCommandOutput(`DIVS result: ${JSON.stringify(result)}`);
+    }
+  })
+
+  commandList.set("MULT", {
+    code: "0011",
+    handler: (params: { numA: number; numB: number }) => {
+      if (!params || !params.numA || !params.numB) {
+        updateCommandOutput("MULT command missing required params.");
+        return;
+      }
+      const result = executeCommand("0011", params);
+      updateCommandOutput(`MULT result: ${JSON.stringify(result)}`);
+    }
+  })
+
 }
 
 /**

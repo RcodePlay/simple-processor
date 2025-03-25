@@ -1,3 +1,5 @@
+import * as alu from './ALU.ts';
+
 let programCount = 0
 
 // REGISTER FUNCTIONS
@@ -8,6 +10,24 @@ function getRegister(reg: 'A' | 'B'): any {
 
 function saveRegister(reg: 'A' | 'B', value: any): void {
   localStorage.setItem(`register_${reg}`, JSON.stringify(value));
+}
+
+function getAccumulator() {
+  const data = localStorage.getItem("accumulator");
+  return data ? JSON.parse(data) : {};
+}
+
+function storeAccumulator(value: any) {
+  localStorage.setItem("accumulator", JSON.stringify(value));
+}
+
+function getCarry() {
+  const data = localStorage.getItem("carry");
+  return data ? JSON.parse(data) : {};
+}
+
+function storeCarry(value: any) {
+  localStorage.setItem("carry", JSON.stringify(value));
 }
 
 // PROGRAM COUNTER FUNCTIONS
@@ -57,7 +77,15 @@ export function executeCommand(code: string, params?: any) {
       console.log("Incremented program counter")
       return `Program line: ${programCount}`;
     },
-    "0004": (params: { reg: 'A' | 'B'; writeValue: any; key?: string }) => {
+    "0004": () => {
+      jumpNextInstruction();
+      return "Skipped 1 instruction";
+    },
+    "0005": () => {
+      let currentLine = getProgramCounter();
+      return `Current line is ${currentLine}`;
+    },
+    "0006": (params: { reg: 'A' | 'B'; writeValue: any; key?: string }) => {
       if (!params || !params.reg || params.writeValue === undefined) {
         console.warn("WRITE command missing parameters.");
         return "WRITE failed: Missing parameters.";
@@ -67,29 +95,48 @@ export function executeCommand(code: string, params?: any) {
       saveRegister(params.reg, regData);
       return `Written ${params.writeValue} to register ${params.reg}`;
     },
-    "0005": (params: { reg: 'A' | 'B' }) => {
+    "0007": (params: { reg: 'A' | 'B' }) => {
       if (!params || !params.reg) {
         console.warn("READ command missing parameters.");
         return "READ failed: Missing parameters.";
       }
       return getRegister(params.reg);
     },
-    "0006": (params: { numA: number, numB: number})=> {
+    "0008": (params: { numA: number, numB: number})=> {
       if (!params || !params.numA || !params.numB ) {
         console.warn("ADD command missing parameters.");
         return "ADD failed: Missing parameters";
       }
-      let result = params.numA + params.numB;
+      let result = alu.add(params.numA, params.numB);
       console.log("ADD command result:", result);
       return `Result of ${params.numA} + ${params.numB} is ${result}`;
     },
-    "0007": () => {
-      jumpNextInstruction();
-      return "Skipped 1 instruction";
+    "0009": (params: { numA: number, numB: number}) => {
+      if (!params || !params.numA || !params.numB) {
+        console.warn("SUBT command missing parameters.");
+        return "SUBT failed: Missing parameters";
+      }
+      let result = alu.subtract(params.numA, params.numB);
+      console.log("SUBT command result:", result);
+      return `Result of ${params.numA} - ${params.numB} is ${result}`;
     },
-    "0008": () => {
-      let currentLine = getProgramCounter();
-      return `Current line is ${currentLine}`;
+    "0010": (params: {numA: number, numB: number}) => {
+      if (!params || !params.numA || !params.numB) {
+        console.warn("DIVS command missing parameters.");
+        return "DIVS failed: Missing parameters";
+      }
+      let result = alu.divide(params.numA, params.numB);
+      console.log("DIVS command result:", result);
+      return `Result of ${params.numA} / ${params.numB} is ${result}`;
+    },
+    "0011": (params: {numA: number, numB: number}) => {
+      if (!params || !params.numA || !params.numB) {
+        console.warn("MULT command missing parameters.");
+        return "MULT failed: Missing parameters";
+      }
+      let result = alu.multiply(params.numA, params.numB);
+      console.log("MULT command result:", result);
+      return `Result of ${params.numA} * ${params.numB} is ${result}`;
     }
   };
 
