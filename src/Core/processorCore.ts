@@ -8,8 +8,9 @@ function getRegister(reg: 'A' | 'B'): any {
   return data ? JSON.parse(data) : {};
 }
 
-function saveRegister(reg: 'A' | 'B', value: any): void {
+function saveRegister(reg: 'A' | 'B', value: any) {
   localStorage.setItem(`register_${reg}`, JSON.stringify(value));
+  return value;
 }
 
 function getAccumulator() {
@@ -19,6 +20,7 @@ function getAccumulator() {
 
 function storeAccumulator(value: any) {
   localStorage.setItem("accumulator", JSON.stringify(value));
+  return value;
 }
 
 function getCarry() {
@@ -28,6 +30,7 @@ function getCarry() {
 
 function storeCarry(value: any) {
   localStorage.setItem("carry", JSON.stringify(value));
+  return value;
 }
 
 // PROGRAM COUNTER FUNCTIONS
@@ -90,9 +93,10 @@ export function executeCommand(code: string, params?: any) {
         console.warn("WRITE command missing parameters.");
         return "WRITE failed: Missing parameters.";
       }
-      const regData = getRegister(params.reg);
-      regData[params.key || "default"] = params.writeValue;
-      saveRegister(params.reg, regData);
+      // const regData = getRegister(params.reg);
+      // regData[params.key || "default"] = params.writeValue;
+
+      saveRegister(params.reg, params.writeValue);
       return `Written ${params.writeValue} to register ${params.reg}`;
     },
     "0007": (params: { reg: 'A' | 'B' }) => {
@@ -137,6 +141,43 @@ export function executeCommand(code: string, params?: any) {
       let result = alu.multiply(params.numA, params.numB);
       console.log("MULT command result:", result);
       return `Result of ${params.numA} * ${params.numB} is ${result}`;
+    },
+    "0012": () => {
+      let regData = getRegister("A");
+
+      storeAccumulator(regData);
+      return `Loaded ${regData} to AC.`;
+
+    },
+    "0013": () => {
+      let acData = getAccumulator();
+      let result = saveRegister("A", acData);
+      return `Saved ${result} to reg A.`
+    },
+    "0014": () => {
+      // Should branch unconditionally, but I don't have any ideas on how to implement this
+    },
+    "0015": () => {
+      let acData = 0
+      let result = storeAccumulator(acData);
+      return `Cleared AC, current value: ${result}`
+    },
+    "0016": () => {
+      let carryData = 0
+      let result = storeCarry(carryData);
+      return `Cleared carry, current value: ${result}`
+    },
+    "0017": (params: { input: number }) => {
+      if (!params || !params.input) {
+        console.warn("INP command missing parameters.");
+        return "INP failed: Missing parameters";
+      }
+      let result = storeAccumulator(params.input);
+      return `Loaded ${result} from UI to AC.`
+    },
+    "0018": () => {
+      let result = getCarry();
+      return `Carry: ${result}`;
     }
   };
 

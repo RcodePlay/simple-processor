@@ -22,10 +22,10 @@ export function setupProcessor(outputElement: HTMLElement) {
       const params: any = {};
 
       // Breaking it down to smaller parts
-      if (command === "WRITE" && parts.length >= 3) {
+      if (command === "WRITE" && parts.length >= 2) {
         params.reg = parts[1].toUpperCase();
         params.writeValue = parseInt(parts[2], 10);
-        params.key = parts[3].toLowerCase() || "default";
+        // params.key = parts[3].toLowerCase() || "default";
       }
 
       if (command === "READ" && parts.length >= 2) {
@@ -50,6 +50,10 @@ export function setupProcessor(outputElement: HTMLElement) {
       if (command === "MULT" && parts.length >= 3) {
         params.numA = parseInt(parts[1], 10);
         params.numB = parseInt(parts[2], 10);
+      }
+
+      if (command === "INP" && parts.length >= 1) {
+        params.input = parseInt(parts[1], 10);
       }
 
       processCommand(command, params);

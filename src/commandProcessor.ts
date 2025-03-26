@@ -90,6 +90,25 @@ function initializeCommands() {
     }
   })
 
+  commandList.set("LDA", { code: "0012" }) // Load memory word to accumulator
+  commandList.set("STA", { code: "0013" }) // Store accumulator content in memory
+  commandList.set("BUN", { code: "0014" }) // Branch unconditionally
+  commandList.set("CLA", { code: "0015" }) // Clear accumulator
+  commandList.set("CLE", { code: "0016" }) // Clear carry bit
+  commandList.set("INP", {
+    code: "0017",
+    handler: (params: { input: number }) => {
+      if (!params || !params.input) {
+        updateCommandOutput("INP command missing required params.")
+        return;
+      }
+      const result = executeCommand("0017", params);
+      updateCommandOutput(`INP result: ${JSON.stringify(result)}`);
+    }
+  })
+
+  commandList.set("RDE", { code: "0018" }) // Read carry
+
 }
 
 /**
