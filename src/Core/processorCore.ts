@@ -61,8 +61,8 @@ function jumpNextInstruction() {
 export function executeCommand(code: string, params?: any) {
   const commandDispatch: { [key: string]: (params?: any) => any } = {
     "0000": () => {
-      console.info("You triggered the NOP command, which stands for 'No operation', meaning, now happens absolutely nothing.")
-      return "NOP triggered";
+      console.info("You triggered the NOP command, which stands for 'No operation', meaning, now happens... absolutely nothing.")
+      return "Executing NOP";
     },
     "0001": () => {
       console.log("IRQ, process interrupted successfully");
@@ -178,6 +178,9 @@ export function executeCommand(code: string, params?: any) {
     "0018": () => {
       let result = getCarry();
       return `Carry: ${result}`;
+    },
+    "1000": () => {
+      return "Cleared terminal"
     }
   };
 

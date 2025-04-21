@@ -7,6 +7,7 @@ let commandList = new Map<string, { code: string; handler?: Function }>();
  */
 function initializeCommands() {
   console.log("Processor was initialized successfully.");
+  updateCommandOutput("Processor initialize", "info");
   commandList.clear();
 
   commandList.set("NOP", { code: "0000" }); // No operation
@@ -21,11 +22,11 @@ function initializeCommands() {
     code: "0006",
     handler: (params: { reg: string; writeValue: number }) => {
       if (!params || !params.reg || params.writeValue === undefined) {
-        updateCommandOutput("WRITE command missing required parameters.");
+        updateCommandOutput("WRITE command missing required parameters.", "error");
         return;
       }
       const result = executeCommand("0006", params);
-      updateCommandOutput(`WRITE executed: ${JSON.stringify(result)}`);
+      updateCommandOutput(`WRITE executed: ${JSON.stringify(result)}`, "success");
     },
   });
 
@@ -34,11 +35,11 @@ function initializeCommands() {
     code: "0007",
     handler: (params: { reg: string }) => {
       if (!params || !params.reg) {
-        updateCommandOutput("READ command missing required params.");
+        updateCommandOutput("READ command missing required params.", "error");
         return;
       }
       const result = executeCommand("0007", params);
-      updateCommandOutput(`READ result: ${JSON.stringify(result)}`);
+      updateCommandOutput(`READ result: ${JSON.stringify(result)}`, "success");
     },
   });
 
@@ -46,11 +47,11 @@ function initializeCommands() {
     code: "0008",
     handler: (params: { numA: number; numB: number }) => {
       if (!params || !params.numA || !params.numB ) {
-        updateCommandOutput("ADD command missing required params.");
+        updateCommandOutput("ADD command missing required params.", "error");
         return;
       }
       const result = executeCommand("0008", params);
-      updateCommandOutput(`ADD result: ${JSON.stringify(result)}`);
+      updateCommandOutput(`ADD result: ${JSON.stringify(result)}`, "success");
     }
   });
 
@@ -58,11 +59,11 @@ function initializeCommands() {
     code: "0009",
     handler: (params: { numA: number; numB: number }) => {
       if (!params || !params.numA || !params.numB) {
-        updateCommandOutput("SUBT command missing required params.");
+        updateCommandOutput("SUBT command missing required params.", "error");
         return;
       }
       const result = executeCommand("0009", params);
-      updateCommandOutput(`SUBT result: ${JSON.stringify(result)}`);
+      updateCommandOutput(`SUBT result: ${JSON.stringify(result)}`, "success");
     }
   })
 
@@ -70,11 +71,11 @@ function initializeCommands() {
     code: "0010",
     handler: (params: { numA: number; numB: number }) => {
       if (!params || !params.numA || !params.numB) {
-        updateCommandOutput("DIVS command missing required params.");
+        updateCommandOutput("DIVS command missing required params.", "error");
         return;
       }
       const result = executeCommand("0010", params);
-      updateCommandOutput(`DIVS result: ${JSON.stringify(result)}`);
+      updateCommandOutput(`DIVS result: ${JSON.stringify(result)}`, "success");
     }
   })
 
@@ -82,11 +83,11 @@ function initializeCommands() {
     code: "0011",
     handler: (params: { numA: number; numB: number }) => {
       if (!params || !params.numA || !params.numB) {
-        updateCommandOutput("MULT command missing required params.");
+        updateCommandOutput("MULT command missing required params.", "error");
         return;
       }
       const result = executeCommand("0011", params);
-      updateCommandOutput(`MULT result: ${JSON.stringify(result)}`);
+      updateCommandOutput(`MULT result: ${JSON.stringify(result)}`, "success");
     }
   })
 
@@ -99,15 +100,17 @@ function initializeCommands() {
     code: "0017",
     handler: (params: { input: number }) => {
       if (!params || !params.input) {
-        updateCommandOutput("INP command missing required params.")
+        updateCommandOutput("INP command missing required params.", "error")
         return;
       }
       const result = executeCommand("0017", params);
-      updateCommandOutput(`INP result: ${JSON.stringify(result)}`);
-    }
+      updateCommandOutput(`INP result: ${JSON.stringify(result)}`, "success");
+    } // Store input in AC
   })
 
   commandList.set("RDE", { code: "0018" }) // Read carry
+
+  commandList.set("CLER", { code: "1000" })
 
 }
 
@@ -116,8 +119,15 @@ function initializeCommands() {
  */
 function processCommand(command: string, params?: any) {
   if (!commandList.has(command)) {
-    updateCommandOutput(`Unknown command: ${command}`);
+    updateCommandOutput(`Unknown command: ${command}`, "error");
     return;
+  }
+
+  if (command === "CLER") {
+    const outputElement = document.getElementById("processor-output");
+    if (outputElement) {
+      outputElement.innerHTML = "";
+    }
   }
 
   const commandObj = commandList.get(command);
@@ -131,7 +141,7 @@ function processCommand(command: string, params?: any) {
 
     // If there's no handler, fallback to executing the command directly
     const result = executeCommand(commandObj.code, params);
-    updateCommandOutput(`Command executed: ${JSON.stringify(result)}`);
+    updateCommandOutput(`Command executed: ${JSON.stringify(result)}`, "info");
   }
 }
 
@@ -140,7 +150,7 @@ function processCommand(command: string, params?: any) {
  */
 function getCommand(command: string) {
   if (!commandList.has(command)) {
-    updateCommandOutput(`Unknown command: ${command}`);
+    updateCommandOutput(`Unknown command: ${command}`, "error");
     return null;
   }
   return commandList.get(command);
@@ -149,11 +159,25 @@ function getCommand(command: string) {
 /**
  * Updates the command output UI in the HTML page.
  */
-function updateCommandOutput(message: string) {
+export function updateCommandOutput(message: string, type: "info" | "error" | "success" = "info") {
   const outputElement = document.getElementById("processor-output");
   if (outputElement) {
-    outputElement.innerHTML = message;
+    const timestamp = new Date().toLocaleTimeString();
+    const color = {
+      info: "#ccc",
+      error: "#f88",
+      success: "#8f8"
+    }[type];
+
+    const newLine = document.createElement("div");
+    newLine.style.color = color;
+    newLine.innerText = `[${timestamp}] ${message}`;
+
+    outputElement.appendChild(newLine);
+    outputElement.scrollTop = outputElement.scrollHeight; // Auto-scroll to bottom
   }
 }
 
-export { initializeCommands, processCommand, getCommand };
+
+
+export { initializeCommands, processCommand, getCommand, commandList };

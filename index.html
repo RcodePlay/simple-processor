@@ -19,7 +19,19 @@
 
     <div class="processor-output">
       <p><strong>Processor Output:</strong></p>
-      <p id="processor-output"></p>
+      <div id="processor-output" style="
+        background-color: #111;
+        color: #ccc;
+        padding: 10px;
+        border-radius: 8px;
+        height: 300px;
+        overflow-y: auto;
+        font-family: monospace;
+        white-space: pre-wrap;">
+      </div>
+
+      <br/>
+      <button id="clear-output">Clear Output</button>
       <hr>
     </div>
 
@@ -31,6 +43,12 @@
       </form>
       <button id="button-reset" type="button">Reset</button>
     </div>
+    <hr/>
+
+    <input type="file" id="file-upload" accept=".txt" />
+    <br/>
+    <p>Uploaded binary compiled output:</p>
+    <div id="output" style="white-space: pre; margin-top: 1em;"></div>
   </section>
 </main>
 
