@@ -1,9 +1,6 @@
-import { commandList } from '../commandProcessor';
-
-export type CompiledInstruction = {
-  opcode: string;
-  argument?: string;
-};
+// import { getCommandInfo } from '../commandProcessor';
+import { CompiledInstruction } from '../types.ts';
+import { commands } from '../commandRegistry.ts';
 
 export function compileSource(text: string): CompiledInstruction[] {
   const lines = text
@@ -13,11 +10,11 @@ export function compileSource(text: string): CompiledInstruction[] {
 
   return lines.map(line => {
     const [instruction, ...args] = line.split(' ');
-    const command = commandList.get(instruction.toUpperCase());
+    const command = commands.getOpcode(instruction.toUpperCase());
     if (!command) throw new Error(`Unknown instruction: ${instruction}`);
 
     return {
-      opcode: command.code,
+      opcode: command,
       argument: args.join(' ') || undefined,
     };
   });

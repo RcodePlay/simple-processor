@@ -1,12 +1,15 @@
-import { initializeCommands, processCommand, updateCommandOutput } from './commandProcessor.ts';
 import { executeCommand } from './Core/processorCore.ts';
 import { compileSource } from './Core/compiler.ts';
+import { updateCommandOutput } from './parser.ts';
+
+import { commands, initialize } from './commandRegistry.ts';
+import { parseCommand } from './parser.ts';
 
 export function setupProcessor(outputElement: HTMLElement) {
-  initializeCommands();
+  initialize();
 
   document.getElementById('button-reset')?.addEventListener('click', () => {
-    processCommand("RST");
+    executeCommand({ opcode: "0002" });
   });
 
   document.getElementById("clear-output")?.addEventListener("click", () => {
@@ -20,52 +23,20 @@ export function setupProcessor(outputElement: HTMLElement) {
   const form = document.getElementById('command-form') as HTMLFormElement;
   const inputElement = document.getElementById('command-input') as HTMLInputElement;
 
+
+
   if (form && inputElement) {
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      const inputValue = inputElement.value.trim();
+      const inputValue = inputElement.value
       if (!inputValue) return;
 
-      // Parsing the command
-      const parts = inputValue.split(" "); // Example: "WRITE A 42"
-      const command = parts[0].toUpperCase();
-      const params: any = {};
+      const parsedCommand = parseCommand(inputValue);
+      console.log(parsedCommand);
 
-      // Breaking it down to smaller parts
-      if (command === "WRITE" && parts.length >= 2) {
-        params.reg = parts[1].toUpperCase();
-        params.writeValue = parseInt(parts[2], 10);
-      }
+      const compiledInstruction = commands.compile(parsedCommand);
+      updateCommandOutput(executeCommand(compiledInstruction));
 
-      if (command === "READ" && parts.length >= 2) {
-        params.reg = parts[1].toUpperCase();
-      }
-
-      if (command === "ADD" && parts.length == 3) {
-        params.numA = parseInt(parts[1], 10);
-        params.numB = parseInt(parts[2], 10);
-      }
-
-      if (command === "SUBT" && parts.length >= 3) {
-        params.numA = parseInt(parts[1], 10);
-        params.numB = parseInt(parts[2], 10);
-      }
-
-      if (command === "DIVS" && parts.length >= 3) {
-        params.numA = parseInt(parts[1], 10);
-        params.numB = parseInt(parts[2], 10);
-      }
-
-      if (command === "MULT" && parts.length >= 3) {
-        params.numA = parseInt(parts[1], 10);
-        params.numB = parseInt(parts[2], 10);
-      }
-
-      if (command === "INP" && parts.length >= 1) {
-        params.input = parseInt(parts[1], 10);
-      }
-
-      processCommand(command, params);
       inputElement.value = ""; // Clear input after execution
     });
   }
@@ -92,14 +63,14 @@ export function setupProcessor(outputElement: HTMLElement) {
 
         if (outputDiv) {
           outputDiv.innerText = compiled
-            .map(inst => `${inst.opcode}${inst.argument ? ' ' + inst.argument : ''}`)
+            .map(inst => `${inst.opcode}${inst.args ? ' ' + JSON.stringify(inst.args) : ''}`)
             .join('\n');
         }
 
 
         compiled.forEach(inst => {
-          updateCommandOutput(executeCommand(inst.opcode, inst.argument))
-          executeCommand("0003")
+          updateCommandOutput(executeCommand(inst))
+          executeCommand({ opcode: "0003" }); // increment PC after every line of program
         });
 
       } catch (error) {
